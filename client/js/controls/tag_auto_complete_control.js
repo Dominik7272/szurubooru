@@ -77,6 +77,34 @@ class TagAutoCompleteControl extends AutoCompleteControl {
             });
         };
 
+        if (options.enableHistory) {
+            const searchHistory = require("../util/search_history.js");
+            options.getHistoryMatches = () => {
+                return new Promise((resolve) => {
+                    const history = searchHistory.getQueryHistory();
+                    const matches = history.map((query) => {
+                        return {
+                            caption: `<span class="history-item"><i class="fa fa-history"></i> ${misc.escapeHtml(query)}</span>`,
+                            isHistory: true,
+                            value: {
+                                isHistory: true,
+                                value: query,
+                            },
+                        };
+                    });
+                    resolve(matches);
+                });
+            };
+            options.delete = (item) => {
+                if (item && item.isHistory) {
+                    searchHistory.removeQueryFromHistory(item.value);
+                }
+            };
+            options.clearHistory = () => {
+                searchHistory.clearQueryHistory();
+            };
+        }
+
         super(input, options);
     }
 
@@ -85,6 +113,9 @@ class TagAutoCompleteControl extends AutoCompleteControl {
             return null;
         }
         const result = this._results[this._activeResult].value;
+        if (result && (result.isHistory || result.isClearHistory || result.isShowMore)) {
+            return result;
+        }
         const textToFind = this._options.getTextToFind();
         result.matchingNames = misc.matchingNames(textToFind, result.names);
         return result;

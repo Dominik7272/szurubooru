@@ -135,6 +135,10 @@ class PostListController {
     }
 
     _syncPageController() {
+        if (this._ctx.parameters.query) {
+            const searchHistory = require("../util/search_history.js");
+            searchHistory.addQueryToHistory(this._ctx.parameters.query);
+        }
         this._pageController.run({
             parameters: this._ctx.parameters,
             defaultLimit: parseInt(settings.get().postsPerPage),
