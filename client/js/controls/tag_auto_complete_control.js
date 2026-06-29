@@ -4,6 +4,7 @@ const misc = require("../util/misc.js");
 const views = require("../util/views.js");
 const TagList = require("../models/tag_list.js");
 const AutoCompleteControl = require("./auto_complete_control.js");
+const searchHistory = require("../util/search_history.js");
 
 function _tagListToMatches(text, tags, options, negated) {
     return [...tags]
@@ -78,7 +79,6 @@ class TagAutoCompleteControl extends AutoCompleteControl {
         };
 
         if (options.enableHistory) {
-            const searchHistory = require("../util/search_history.js");
             options.getHistoryMatches = () => {
                 return new Promise((resolve) => {
                     const history = searchHistory.getQueryHistory();

@@ -1,14 +1,16 @@
 "use strict";
 
+const api = require("../api.js");
+const settings = require("../models/settings.js");
+const uri = require("./uri.js");
+
 const MAX_HISTORY_ITEMS = 50;
 const HISTORY_KEY = "szurubooru-search-history-anonymous";
 
 function getQueryHistory() {
-    const settings = require("../models/settings.js");
     if (settings.get().searchHistoryEnabled === false) {
         return [];
     }
-    const api = require("../api.js");
     if (api.userName && api.user) {
         try {
             return api.user.searchHistory ? JSON.parse(api.user.searchHistory) : [];
@@ -25,7 +27,6 @@ function getQueryHistory() {
 }
 
 function addQueryToHistory(query) {
-    const settings = require("../models/settings.js");
     if (settings.get().searchHistoryEnabled === false) {
         return;
     }
@@ -51,10 +52,9 @@ function clearQueryHistory() {
 }
 
 function saveHistory(history) {
-    const api = require("../api.js");
     if (api.userName && api.user) {
         api.user.searchHistory = JSON.stringify(history);
-        api.put("/user/" + api.userName, {
+        api.put(uri.formatApiLink("user", api.userName), {
             version: api.user.version,
             searchHistory: api.user.searchHistory
         }).then(
